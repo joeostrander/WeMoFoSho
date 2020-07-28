@@ -430,7 +430,10 @@ namespace WeMoFoSho
         private void UdpServer()
         {
             mreUdpReceiveDone.Reset();
-            UdpClient udpServer = new UdpClient(portMulti);
+            //UdpClient udpServer = new UdpClient(portMulti);
+            UdpClient udpServer = new UdpClient();
+            udpServer.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            //udpServer.Client.Bind(new IPEndPoint(IPAddress.Any, portMulti));
 
             try
             {
@@ -443,8 +446,10 @@ namespace WeMoFoSho
                 //    Console.WriteLine("Failed to get ip address");
                 //    return;
                 //}
-                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, 1900);
+                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, portMulti);
                 //IPEndPoint localEndPoint = new IPEndPoint(localIPAddr, 1900);
+
+                udpServer.Client.Bind(localEndPoint);
 
                 udpServer.JoinMulticastGroup(multicastaddress);
                 udpServer.MulticastLoopback = true;
@@ -567,7 +572,7 @@ namespace WeMoFoSho
                     case "/upnp/control/basicevent1":
                         Debug.WriteLine("***ECHO COMMAND on port:  " + request.Url.Port.ToString());
 
-                        Console.WriteLine("BODY {0}", body);
+                        //Console.WriteLine("BODY {0}", body);
                         
                         if (true || body.Contains("GetBinaryState"))
                         {
@@ -615,7 +620,6 @@ namespace WeMoFoSho
                 
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.Close(buffer, true);
-
 
 
 
